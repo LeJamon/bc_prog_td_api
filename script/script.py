@@ -16,6 +16,7 @@ c = conn_kline.cursor()
 
 
 
+
 def GetCoin():
     response = requests.get("https://api.binance.com/api/v3/exchangeInfo")
     results = response.json()
