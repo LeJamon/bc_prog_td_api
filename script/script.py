@@ -1,5 +1,5 @@
 import requests
-import pandas as pd 
+
 import sqlite3
 import  pprint
 import hmac
@@ -12,7 +12,9 @@ api_key = config('api_key')
 sec_key = config('sec_key')
 
 conn_kline = sqlite3.connect('kline.db')
+conn_trade = sqlite3.connect('trade.db')
 c = conn_kline.cursor()
+d = conn_trade.cursor()
 
 
 
@@ -39,24 +41,39 @@ def orderBook(direction, _symbol):
 
 def refreshDataCandleStick(_symbol, _duration):
 
-    #ajoputer un moyen de choper les valeurs plus récentes que la dernières en date
+    
     response = requests.get("https://api.binance.com/api/v3/uiKlines",
         params=dict(symbol=_symbol, interval=_duration))
     results = response.json()
-    
-    #get the last kandle stick 
+    print(results[0][0])
+    #get the 500 last kandle stick 
     
     for i in range(499):
-        c.execute("INSERT INTO kline VALUES(?,?,?,?,?,?,?)",
+        
+        #use ignore to avoid problem with the same id because id is based on the unix time
+        c.execute("INSERT OR IGNORE INTO kline VALUES(?,?,?,?,?,?,?)", 
         (results[i][0], results[i][0], results[i][2], results[i][3], results[i][1], results[i][4], results[i][5]))
         conn_kline.commit()
+    print("done")
 
 
-def refreshData(_symbol): #ajouter la partie database 
+def refreshDataTrade(_symbol): #ajouter la partie database 
     response = requests.get("https://api.binance.com/api/v3/trades",
                  params=dict(symbol=_symbol))
     results = response.json()
-    pprint.pprint(results)
+    #get the 500 last trades
+    #a = list(results[0].values())
+    #print(a)
+    for i in range(len(results)):
+       
+         #use ignore to avoid problem with the same id because id is based on the binance trade id
+         # if buyer maker is false, it's a BUY, if true it's a SELL 
+         datalist = list(results[i].values())
+         d.execute("INSERT OR IGNORE INTO trade VALUES(?,?,?,?,?,?)", 
+         (datalist[0], datalist[0], _symbol, datalist[1], datalist[4], datalist[5]))
+         conn_trade.commit()
+    print("done")
+
 
 
 def makeMarketOrder(_symbol,_side,_quantity):
@@ -114,4 +131,5 @@ def cancelOrder(_symbol, _orderId):
     response = requests.delete("https://api.binance.com/api/v3/order",headers=header, params=param)
     pprint.pprint(response.json())
 
-makeMarketOrder('DOTBUSD','BUY','3')
+refreshDataTrade('BTCUSDT')
+#refreshDataCandleStick('BTCUSDT','5m')
