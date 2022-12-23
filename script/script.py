@@ -108,9 +108,15 @@ def refreshDataTrade(_symbol):
     last_ckeck = int(time.time()*1000)
     _duration = 'none'
 
+    #insert into tracking
     c.execute("INSERT INTO tracking(exchange, trading_pair,duration,table_name,last_check,last_id) VALUES(?,?,?,?,?,?)", 
         (exchange, _symbol, _duration, table_name, last_ckeck,  last_id))
     conn.commit()
+
+    #close connection
+    c.close()
+    conn.close()
+
 
 
 def makeMarketOrder(_symbol,_side,_quantity):
