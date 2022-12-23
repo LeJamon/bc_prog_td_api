@@ -1,32 +1,44 @@
 import sqlite3
-conn_kline = sqlite3.connect('kline.db')
-conn_trade = sqlite3.connect('trade.db')
+conn = sqlite3.connect('data.db')
 
 
-c_kline = conn_kline.cursor()
-c_trade = conn_trade.cursor()
+c = conn.cursor()
 
 
-sql_kline ='''CREATE TABLE KLINE(
-    Id INETGER PRIMARY KEY, 
+
+sql_kline ='''CREATE TABLE kline(
+    Id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    pair TEXT, 
     date INT,
     high REAL,
     low REAL,
     open REAL, 
     close REAL, 
-    volume REAL, 
-    UNIQUE(Id, date)
+    volume REAL
  )'''
 
-sql_trade ='''CREATE TABLE TRADE(
-   Id INETGER PRIMARY KEY, 
+sql_trade ='''CREATE TABLE trade(
+   Id INTEGER PRIMARY KEY AUTOINCREMENT, 
    uuid TEXT, 
    traded_crypto TEXT,
    price REAL,
-   created_at_int INT, 
-   side _TEXT, 
-   UNIQUE(Id)
+   created_at INT, 
+   side TEXT
 )'''
 
-#c_kline.execute(sql_kline)
-c_trade.execute(sql_trade)
+sql_update = '''CREATE TABLE tracking(
+   Id INTEGER PRIMARY KEY AUTOINCREMENT, 
+   exchange TEXT, 
+   trading_pair TEXT,
+   duration TEXT, 
+   table_name TEXT, 
+   last_check INT, 
+   last_id INT
+)'''
+
+c.execute(sql_kline)
+c.execute(sql_trade)
+c.execute(sql_update)
+
+c.close()
+conn.close()

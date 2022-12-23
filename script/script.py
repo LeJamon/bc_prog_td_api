@@ -10,10 +10,9 @@ from decouple import config
 api_key = config('api_key')
 sec_key = config('sec_key')
 
-conn_kline = sqlite3.connect('kline.db')
-conn_trade = sqlite3.connect('trade.db')
-c = conn_kline.cursor()
-d = conn_trade.cursor()
+conn = sqlite3.connect('data.db')
+c = conn.cursor()
+
 
 
 def GetCoin():
@@ -38,39 +37,80 @@ def orderBook(_symbol):
 
 def refreshDataCandleStick(_symbol, _duration):
 
+    #open database connection
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
     
+    #call the binance api 
     response = requests.get("https://api.binance.com/api/v3/uiKlines",
         params=dict(symbol=_symbol, interval=_duration))
     results = response.json()
     pprint.pprint(results)
+
     #get the 500 last kandle stick 
-    
-    for i in range(499):
-        
+    print("Storing data in database")
+    for i in range(len(results)):
+
+        data=(_symbol, results[i][0])
+        c.execute("SELECT * FROM kline WHERE pair=? AND date=?", data[:2])
+
+        if not c.fetchone():
         #use ignore to avoid problem with the same id because id is based on the unix time
-        c.execute("INSERT OR IGNORE INTO kline VALUES(?,?,?,?,?,?,?)", 
-        (results[i][0], results[i][0], results[i][2], results[i][3], results[i][1], results[i][4], results[i][5]))
-        conn_kline.commit()
-    print("done")
+            c.execute("INSERT  INTO kline(pair, date,high,low,open,close,volume) VALUES(?,?,?,?,?,?,?)", 
+            ( _symbol, results[i][0], results[i][2], results[i][3], results[i][1], results[i][4], results[i][5]))
+            conn.commit()
+    print("Done")
 
+    #declare param for the trackning table
+    c.execute("SELECT MAX(Id) from kline")
+    last_id = c.fetchone()[0]
+    exchange = "binance"
+    table_name = 'kline'
+    last_ckeck = int(time.time()*1000)
 
-def refreshDataTrade(_symbol): #ajouter la partie database 
+    c.execute("INSERT INTO tracking(exchange, trading_pair,duration,table_name,last_check,last_id) VALUES(?,?,?,?,?,?)", 
+        (exchange, _symbol, _duration, table_name, last_ckeck,  last_id))
+    conn.commit()
+
+    c.close()
+    conn.close()
+
+def refreshDataTrade(_symbol): 
+
+    #open database connection
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+
+    #call binance api 
     response = requests.get("https://api.binance.com/api/v3/trades",
                  params=dict(symbol=_symbol))
     results = response.json()
-    #get the 500 last trades
-    #a = list(results[0].values())
-    #print(a)
+    pprint.pprint(results)
     for i in range(len(results)):
-       
+        datalist = list(results[i].values())
+        data=(_symbol, datalist[0])
+        c.execute("SELECT * FROM trade WHERE traded_crypto=? AND uuid=?", data[:2])
+
+        if not c.fetchone():
          #use ignore to avoid problem with the same id because id is based on the binance trade id
          # if buyer maker is false, it's a BUY, if true it's a SELL 
-         datalist = list(results[i].values())
-         d.execute("INSERT OR IGNORE INTO trade VALUES(?,?,?,?,?,?)", 
-         (datalist[0], datalist[0], _symbol, datalist[1], datalist[4], datalist[5]))
-         conn_trade.commit()
+         
+            c.execute("INSERT INTO trade(uuid, traded_crypto,price,created_at, side) VALUES(?,?,?,?,?)", 
+            (datalist[0], _symbol, datalist[1], datalist[4], datalist[5]))
+            conn.commit()
     print("done")
 
+     #declare param for the trackning table
+    c.execute("SELECT MAX(Id) from trade")
+    last_id = c.fetchone()[0]
+    exchange = "binance"
+    table_name = 'trade'
+    last_ckeck = int(time.time()*1000)
+    _duration = 'none'
+
+    c.execute("INSERT INTO tracking(exchange, trading_pair,duration,table_name,last_check,last_id) VALUES(?,?,?,?,?,?)", 
+        (exchange, _symbol, _duration, table_name, last_ckeck,  last_id))
+    conn.commit()
 
 
 def makeMarketOrder(_symbol,_side,_quantity):
