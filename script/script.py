@@ -221,14 +221,14 @@ def menu():
 
     elif choice == "6":
       print("You selected option 6")
-      pair = input("Choose the pair you want to look at eg BTCUSDT : ")
+      pair = input("Choose the pair you want to trade at eg BTCUSDT : ")
       side = input("Choose the side eg BUY or SELL : ")
       quantity = input("Choose how many crypto you want to trade : ")
       makeMarketOrder(pair, side, quantity)
     
     elif choice == "7":  
       print("You selected option 7")
-      pair = input("Choose the pair you want to look at eg BTCUSDT : ")
+      pair = input("Choose the pair you want to trade at eg BTCUSDT : ")
       side = input("Choose the side eg BUY or SELL : ")
       quantity = input("Choose how many crypto you want to trade : ")
       price = input("Choose the price for your order : ")
