@@ -43,7 +43,7 @@ You will have access to a console menu and a bunch of options.
 
 ### Example with pictures 
 ![Start](https://i.ibb.co/c6JMbp1/320390089-891713985181199-96471564372930332-n.png)
-![Menu](https://i.ibb.co/f4B9wPh/320366858-653775983097384-1633929445962428858-n.png)
 ![Ask](https://i.ibb.co/6w26wvB/320784429-686119593190901-2660351322484770106-n.png)
 ![Bids](https://i.ibb.co/TcW0Fzr/319515365-732240501238445-2722059927117576366-n.png)
+![Menu](https://i.ibb.co/f4B9wPh/320366858-653775983097384-1633929445962428858-n.png)
 ![listing pairs](https://i.ibb.co/kSPxqCh/320073794-689285462827394-3312893504665189451-n.png)
