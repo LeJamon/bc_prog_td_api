@@ -7,13 +7,13 @@ from hashlib import sha256
 from urllib.parse import urlencode
 from decouple import config
 
-api_key = config('api_key')
-sec_key = config('sec_key')
+#set here your api key and secret key
+api_key = config('your_api_key')
+sec_key = config('your_sec_key')
 
+#connect to data.db databse -> you should first have created the database by running create_database.py
 conn = sqlite3.connect('data.db')
 c = conn.cursor()
-
-
 
 def GetCoin():
     response = requests.get("https://api.binance.com/api/v3/ticker/price")
@@ -47,7 +47,7 @@ def refreshDataCandleStick(_symbol, _duration):
     results = response.json()
     pprint.pprint(results)
 
-    #get the 500 last kandle stick 
+    #get the 500 last candle stick 
     print("Storing data in database")
     for i in range(len(results)):
 
@@ -175,7 +175,7 @@ def cancelOrder(_symbol, _orderId):
 
 
 
-
+#main menu
 def print_menu():
   print("1. Get all pairs listed on binance")
   print("2. Get the bid or ask on a pair")
@@ -187,47 +187,47 @@ def print_menu():
   print("8. Delete an order") 
   print("9. Quit")
  
-
+#Menu and option selection
 def menu():
   while True:
     print_menu()
     choice = input("Enter your choice: ")
 
     if choice == "1":
-      print("You selected option 1")
+      print("\nYou selected option 1")
       GetCoin()
 
     elif choice == "2":
-      print("You selected option 2")
-      direction = input("Choose the direction, bids or asks : ")
-      pair = input("Choose the pair you want to look at eg BTCUSDT : ")
+      print("\nYou selected option 2")
+      direction = input("\nChoose the direction, bids or asks : ")
+      pair = input("\nChoose the pair you want to look at eg BTCUSDT : ")
       getDepth(direction, pair)
 
     elif choice == "3":
-      print("You selected option 3")
-      pair = input("Choose the pair you want to look at eg BTCUSDT : ")
+      print("\nYou selected option 3")
+      pair = input("\nChoose the pair you want to look at eg BTCUSDT : ")
       orderBook(pair)
    
     elif choice == "4":
-      print("You selected option 4")
-      pair = input("Choose the pair you want to look at eg BTCUSDT : ")
-      duration = input("Choose the duration of the candlestick eg 5m : ")
+      print("\nYou selected option 4")
+      pair = input("\nChoose the pair you want to look at eg BTCUSDT : ")
+      duration = input("\nChoose the duration of the candlestick eg 5m : ")
       refreshDataCandleStick(pair, duration)
 
     elif choice == "5":
-      print("You selected option 5")
-      pair = input("Choose the pair you want to look at eg BTCUSDT : ")
+      print("\nYou selected option 5")
+      pair = input("\nChoose the pair you want to look at eg BTCUSDT : ")
       refreshDataTrade(pair)      
 
     elif choice == "6":
-      print("You selected option 6")
+      print("\nYou selected option 6\n")
       pair = input("Choose the pair you want to trade at eg BTCUSDT : ")
-      side = input("Choose the side eg BUY or SELL : ")
-      quantity = input("Choose how many crypto you want to trade : ")
+      side = input("\nChoose the side eg BUY or SELL : ")
+      quantity = input("\nChoose how many crypto you want to trade : ")
       makeMarketOrder(pair, side, quantity)
     
     elif choice == "7":  
-      print("You selected option 7")
+      print("\nYou selected option 7\n")
       pair = input("Choose the pair you want to trade at eg BTCUSDT : ")
       side = input("Choose the side eg BUY or SELL : ")
       quantity = input("Choose how many crypto you want to trade : ")
@@ -235,14 +235,14 @@ def menu():
       makeLimitOrder(pair, side, quantity, price)
     
     elif choice == "8":
-      print("You selected option 8")
+      print("\nYou selected option 8\n")
       orderId = input("Choose the Id of the order you want to cancel")
       cancelOrder(orderId)
 
     elif choice == "9":
       break
     else:
-      print("Invalid choice. Please try again.")
+      print("\nInvalid choice. Please try again.\n")
     print("")
 
 menu()

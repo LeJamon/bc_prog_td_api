@@ -1,6 +1,12 @@
 import sqlite3
 conn = sqlite3.connect('data.db')
 
+#Simple script to create the database : data.db
+#It creates 3 tables : kline, trade and tracking
+#kline : store the kline data
+#trade : store the trade data
+#tracking : store the last id of the last kline/trade retrieved
+
 
 c = conn.cursor()
 

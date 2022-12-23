@@ -1,5 +1,9 @@
 import sqlite3
 
+#This script allows you to ask the database for the data stored in the tables and print it in the console
+#It is used to check if the data is correctly stored in the database
+
+
 def ask_kline(): 
     conn= sqlite3.connect('data.db')
     c= conn.cursor()
@@ -18,7 +22,7 @@ def ask_tracking():
     for row in c.execute('''SELECT * FROM tracking order by Id'''):
         print(row)
 
-
+#Menu to ask the database
 def print_menu():
   print("1. Ask kline table")
   print("2. Ask trade table")
